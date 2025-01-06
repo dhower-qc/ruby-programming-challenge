@@ -24,3 +24,5 @@ To submit your entry, create a Pull Request against this repository (https://git
 
 - Contains your submission in a new directory under `submissions` named after your GitHub username. For example, `submissions/dhower-qc`.
 - Contains a ruby script at `submissions/<username>/run.rb` that fufills the requirements above and can be run without needing any command-line parameters
+
+You will need to create a fork of this repository. See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork for more information.
