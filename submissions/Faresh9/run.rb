@@ -6,7 +6,7 @@ class InstructionProcessor
   end
 
   def load_instructions
-    files = Dir.glob('../db/**/*.yaml')
+    files = Dir.glob('../../db/**/*.yaml')
     files.map do |file|
       content = YAML.load_file(file)
       content['_filename'] = File.basename(file, '.yaml')
