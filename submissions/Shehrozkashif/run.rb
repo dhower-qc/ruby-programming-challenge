@@ -1,28 +1,43 @@
 require 'yaml'
+require 'find'
 
-DB_DIRECTORY = 'db/'
+DB_DIRECTORY = '/home/shehroz/Desktop/lfx/ruby-programming-challenge/db'
 
-yaml_files = Dir.glob("#{DB_DIRECTORY}/*.yaml")
+# Recursively find all YAML files inside db/ and its subdirectories
+yaml_files = []
+Find.find(DB_DIRECTORY) do |path|
+  yaml_files << path if path.end_with?('.yaml')
+end
+
 instructions = []
 
+# Load instructions and check name mismatches
 yaml_files.each do |file_path|
-  instruction_data = YAML.load_file(file_path)
-  instruction_name = instruction_data['name']
-  filename_without_extension = File.basename(file_path, ".yaml")
+  begin
+    instruction_data = YAML.load_file(file_path)
+    next unless instruction_data.is_a?(Hash) && instruction_data['name']
 
-  if instruction_name != filename_without_extension
-    puts "⚠️  Warning: #{filename_without_extension}.yaml has a mismatched name: #{instruction_name}"
+    instruction_name = instruction_data['name']
+    filename_without_extension = File.basename(file_path, ".yaml")
+
+    if instruction_name != filename_without_extension
+      puts "⚠️  Warning: #{filename_without_extension}.yaml has a mismatched name: #{instruction_name}"
+    end
+
+    instructions << instruction_data
+  rescue StandardError => e
+    puts "❌ Error loading #{file_path}: #{e.message}"
   end
-
-  instructions << instruction_data
 end
 
 puts "✅ Successfully loaded #{yaml_files.size} YAML files containing #{instructions.size} instructions."
 
+# Ask user for a list of extensions
 print "Enter a comma-separated list of extensions: "
 user_input = gets.chomp
 selected_extensions = user_input.split(",").map(&:strip)
 
+# Function to check if an instruction matches the selected extensions
 def matches_extension?(defined_by, selected_extensions)
   case defined_by
   when String
@@ -40,10 +55,13 @@ def matches_extension?(defined_by, selected_extensions)
   end
 end
 
+# Filter instructions by selected extensions
 matching_instructions = instructions.select do |instr|
-  matches_extension?(instr['definedBy'], selected_extensions)
+  defined_by = instr['definedBy']
+  defined_by && matches_extension?(defined_by, selected_extensions)
 end
 
+# Print matching instructions
 if matching_instructions.empty?
   puts "❌ No instructions found for the selected extensions."
 else
